@@ -21,5 +21,34 @@ export const brands: Brand[] = [
     name: 'Vertex',
     logoUrl: 'https://dummyimage.com/120x40/6a1b9a/ffffff&text=Vertex',
   },
+  {
+    id: 5,
+    name: 'HelioWare',
+    logoUrl: 'https://dummyimage.com/120x40/1565c0/ffffff&text=HelioWare',
+  },
+  {
+    id: 6,
+    name: 'QuantumEdge',
+    logoUrl: 'https://dummyimage.com/120x40/37474f/ffffff&text=QuantumEdge',
+  },
+  {
+    id: 7,
+    name: 'IronPeak',
+    logoUrl: 'https://dummyimage.com/120x40/2e7d32/ffffff&text=IronPeak',
+  },
+  {
+    id: 8,
+    name: 'Lumina',
+    logoUrl: 'https://dummyimage.com/120x40/5d4037/ffffff&text=Lumina',
+  },
+  {
+    id: 9,
+    name: 'CoreSphere',
+    logoUrl: 'https://dummyimage.com/120x40/0277bd/ffffff&text=CoreSphere',
+  },
+  {
+    id: 10,
+    name: 'SkyGrid',
+    logoUrl: 'https://dummyimage.com/120x40/455a64/ffffff&text=SkyGrid',
+  },
 ];
-
