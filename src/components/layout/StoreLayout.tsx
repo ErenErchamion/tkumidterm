@@ -1,12 +1,11 @@
 import { Box, CircularProgress, Container, Grid } from '@mui/material';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { ProductService } from '../../api/services/ProductService';
-import { useCart } from '../../context/CartContext';
 import type { Brand, Category } from '../../types/models';
 import { CartDrawer } from '../cart/CartDrawer';
-import { AppHeader } from './AppHeader';
-import { FilterSidebar } from './FilterSidebar';
+import Header from './Header';
+import SidebarFilters from './SidebarFilters';
 
 export type StoreOutletContext = {
   selectedCategoryId: number | null;
@@ -16,14 +15,15 @@ export type StoreOutletContext = {
 };
 
 export const StoreLayout = () => {
-  const { totalItems } = useCart();
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const selectedCategoryId = Number(searchParams.get('category')) || null;
 
   const selectedBrandId = (() => {
     const matchedBrandId = /^\/brand\/(\d+)$/.exec(location.pathname)?.[1];
@@ -31,11 +31,16 @@ export const StoreLayout = () => {
   })();
 
   const handleCategorySelect = (categoryId: number | null) => {
-    setSelectedCategoryId((prev) => (prev === categoryId ? null : categoryId));
+    const nextCategoryId = selectedCategoryId === categoryId ? null : categoryId;
+    const nextSearchParams = new URLSearchParams(searchParams);
 
-    if (location.pathname !== '/') {
-      navigate('/');
+    if (nextCategoryId === null) {
+      nextSearchParams.delete('category');
+    } else {
+      nextSearchParams.set('category', String(nextCategoryId));
     }
+
+    setSearchParams(nextSearchParams);
   };
 
   const handleBrandSelect = (brandId: number | null) => {
@@ -72,13 +77,7 @@ export const StoreLayout = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
-      <AppHeader
-        categories={categories}
-        cartItemCount={totalItems}
-        selectedCategoryId={selectedCategoryId}
-        onCategorySelect={handleCategorySelect}
-        onCartClick={() => setIsCartOpen(true)}
-      />
+      <Header onOpenCart={() => setIsCartOpen(true)} />
       <Container maxWidth="lg" sx={{ py: 4 }}>
         {isLoading ? (
           <Box sx={{ display: 'grid', placeItems: 'center', minHeight: 260 }}>
@@ -87,13 +86,13 @@ export const StoreLayout = () => {
         ) : (
           <Grid container spacing={3}>
             <Grid size={{ xs: 12, md: 3 }}>
-              <FilterSidebar
+              <SidebarFilters
                 categories={categories}
                 brands={brands}
                 selectedCategoryId={selectedCategoryId}
                 selectedBrandId={selectedBrandId}
-                onCategorySelect={handleCategorySelect}
-                onBrandSelect={handleBrandSelect}
+                onCategoryChange={handleCategorySelect}
+                onBrandChange={handleBrandSelect}
               />
             </Grid>
             <Grid size={{ xs: 12, md: 9 }}>

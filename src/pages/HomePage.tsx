@@ -34,6 +34,7 @@ export const HomePage = () => {
     );
   }, []);
 
+
   const filteredProducts = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
 
