@@ -1,30 +1,10 @@
-import { withDelay } from '../utils/delay';
-import type { CreateOrderPayload } from '../types/models';
+import { api } from '../utils/api';
+import type { CreateOrderPayload, Order } from '../types/models';
 
-type CheckoutOrder = {
-  id: string;
-  orderNumber: number;
-  date: string;
-  totalAmount: number;
-  items: CreateOrderPayload['items'];
+export const createOrder = async (payload: CreateOrderPayload): Promise<Order> => {
+  return api.post<Order>('/orders', payload);
 };
 
-let orders: CheckoutOrder[] = [];
-
-const generateOrderNumber = () => Math.floor(100000 + Math.random() * 900000);
-
-export const createOrder = async (payload: CreateOrderPayload): Promise<CheckoutOrder> => {
-  const order: CheckoutOrder = {
-    id: `${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-    orderNumber: generateOrderNumber(),
-    date: new Date().toISOString(),
-    totalAmount: payload.totalAmount,
-    items: payload.items,
-  };
-
-  orders = [order, ...orders];
-  return withDelay(order, 800);
+export const getOrders = async (): Promise<Order[]> => {
+  return api.get<Order[]>('/orders');
 };
-
-export const getOrders = async (): Promise<CheckoutOrder[]> => withDelay([...orders], 500);
-

@@ -1,5 +1,4 @@
-import { products } from '../mockData/products';
-import { withDelay } from '../utils/delay';
+import { api } from '../utils/api';
 import type { Product } from '../types/models';
 
 type ProductQuery = {
@@ -8,22 +7,18 @@ type ProductQuery = {
 };
 
 export const getAllProducts = async (params: ProductQuery = {}): Promise<Product[]> => {
-  const { categoryId, brandId } = params;
-  let filtered = [...products];
-
-  if (categoryId) {
-    filtered = filtered.filter((item) => item.categoryId === Number(categoryId));
+  const queryParams = new URLSearchParams();
+  if (params.categoryId) {
+    queryParams.append('categoryId', String(params.categoryId));
   }
-
-  if (brandId) {
-    filtered = filtered.filter((item) => item.brandId === Number(brandId));
+  if (params.brandId) {
+    queryParams.append('brandId', String(params.brandId));
   }
-
-  return withDelay(filtered, 600);
+  const queryString = queryParams.toString();
+  const path = queryString ? `/products?${queryString}` : '/products';
+  return api.get<Product[]>(path);
 };
 
 export const getProductById = async (productId: number | string): Promise<Product | null> => {
-  const product = products.find((item) => item.id === Number(productId)) ?? null;
-  return withDelay(product, 500);
+  return api.get<Product | null>(`/products/${productId}`);
 };
-

@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { OrderService } from '../api/services/OrderService';
+import { useNavigate } from 'react-router-dom';
+import { createOrder } from '../services/orderService';
+import { useAuth } from './AuthContext';
 import type { CartItem, Order, Product } from '../types/models';
 
 type OrderNotice = {
@@ -36,6 +38,8 @@ export const CartProvider = ({ children }: CartProviderProps) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
   const [orderNotice, setOrderNotice] = useState<OrderNotice | null>(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const addToCart = useCallback((product: Product, quantity = 1) => {
     setCartItems((prev) => {
@@ -90,6 +94,12 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       return null;
     }
 
+    if (!user) {
+      alert("Sipariş oluşturmak için lütfen öncelikle giriş yapın.");
+      navigate('/login');
+      return null;
+    }
+
     setIsCheckoutLoading(true);
 
     try {
@@ -103,7 +113,7 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         })),
       };
 
-      const createdOrder = await OrderService.createOrder(payload);
+      const createdOrder = await createOrder(payload);
       setOrders((prev) => [createdOrder, ...prev]);
       setCartItems([]);
       setOrderNotice({
@@ -111,10 +121,14 @@ export const CartProvider = ({ children }: CartProviderProps) => {
         orderNumber: createdOrder.id,
       });
       return createdOrder;
+    } catch (error: any) {
+      console.error('Checkout error:', error);
+      alert(error.message || 'Sipariş oluşturulurken bir hata oluştu.');
+      return null;
     } finally {
       setIsCheckoutLoading(false);
     }
-  }, [cartItems, totalAmount]);
+  }, [cartItems, totalAmount, user, navigate]);
 
   const closeOrderNotice = useCallback(() => {
     setOrderNotice(null);

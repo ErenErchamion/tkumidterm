@@ -7,6 +7,9 @@ import { useCart } from './context/CartContext';
 import BrandPage from './pages/BrandPage';
 import HomePage from './pages/HomePage';
 import ProductDetailsPage from './pages/ProductDetailsPage';
+import LoginPage from './pages/LoginPage';
+import OrdersPage from './pages/OrdersPage';
+import AdminPage from './pages/AdminPage';
 
 function App() {
   const [cartOpen, setCartOpen] = useState(false);
@@ -21,6 +24,9 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/product/:id" element={<ProductDetailsPage />} />
         <Route path="/brand/:id" element={<BrandPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/admin" element={<AdminPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 

@@ -17,6 +17,7 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import { Link as RouterLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import { getAllCategories } from '../../services/categoryService';
 import type { Category } from '../../types/models';
 
@@ -29,6 +30,7 @@ type HeaderProps = {
 
 export default function Header({ onOpenCart }: HeaderProps) {
   const { totalItems, orderNotice } = useCart();
+  const { user, isAdmin, logout } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
   const [announcementAnchor, setAnnouncementAnchor] = useState<HTMLElement | null>(null);
   const navigate = useNavigate();
@@ -83,6 +85,29 @@ export default function Header({ onOpenCart }: HeaderProps) {
         </Box>
 
         <Box sx={{ flexGrow: 1 }} />
+
+        {user ? (
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' }, fontWeight: 600 }}>
+              {user.email} {isAdmin && <span style={{ color: '#d32f2f', marginLeft: 4, fontWeight: 'bold' }}>(Admin)</span>}
+            </Typography>
+            <Button size="small" variant="text" component={RouterLink} to="/orders" sx={{ textTransform: 'none', color: 'text.primary' }}>
+              Siparişlerim
+            </Button>
+            {isAdmin && (
+              <Button size="small" variant="text" color="primary" component={RouterLink} to="/admin" sx={{ textTransform: 'none', fontWeight: 'bold' }}>
+                Yönetim
+              </Button>
+            )}
+            <Button size="small" color="error" variant="outlined" onClick={logout} sx={{ textTransform: 'none' }}>
+              Çıkış
+            </Button>
+          </Stack>
+        ) : (
+          <Button size="small" variant="contained" component={RouterLink} to="/login" sx={{ textTransform: 'none' }}>
+            Giriş Yap
+          </Button>
+        )}
 
         <IconButton color="primary" onClick={(event) => setAnnouncementAnchor(event.currentTarget)}>
           <Badge badgeContent={announcementItems.length} color="info">
